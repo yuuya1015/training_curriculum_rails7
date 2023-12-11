@@ -2,7 +2,7 @@ class CalendarsController < ApplicationController
 
   # １週間のカレンダーと予定が表示されるページ
   def index
-    getWeek
+    get_week
     @plan = Plan.new
   end
 
@@ -18,7 +18,7 @@ class CalendarsController < ApplicationController
     params.require(:plan). permit(:date, :plan)
   end
 
-  def getWeek
+  def get_week
     wdays = ['(日)','(月)','(火)','(水)','(木)','(金)','(土)']
 
 
@@ -32,8 +32,8 @@ class CalendarsController < ApplicationController
 
     plans = Plan.where(date: @todays_date..@todays_date + 6)
 
+    today_plans = []
     7.times do |x|
-      today_plans = []
       plans.each do |plan|
         today_plans.push(plan.plan) if plan.date == @todays_date + x
       end
@@ -50,7 +50,10 @@ class CalendarsController < ApplicationController
           :plans => today_plans
              }
 
+
+      days = { month: (@todays_date + x).month, date: (@todays_date + x).day, plans: today_plans }
       @week_days.push(days)
+      today_plans = [] # ループの終了後に初期化する
     end
   end
 end
